@@ -1,0 +1,75 @@
+#O perímetro do hexágono inscrito fornece uma aproximação inferior da estimativa;
+#O perímetro do hexágono circunscrito fornece uma estimativa superior;
+
+import math
+
+def poligono(s,r):
+
+  """
+  define o lado do próximo polígono inscrito que tem o dobro de lados do]
+  anterior, retorna esse lado como s atualizado
+  """
+  a = math.sqrt(1-(s/2)**2)
+  b = 1 - a
+  s = math.sqrt(b**2+((s/2)**2))
+  return s
+
+def arpimedes(N,r):
+    """
+    calcula  o valor estimado de pi usando o metodo de arquimedes e um
+    polígono de N lados inscrito em um círculo de raio R.
+    retorna o valor estimado de pi.
+
+    como começamos com um hexágono temos as seguintes condições:
+    - se N = 6 * 2^k, ele vai iterar até um valor dado.
+    - se não, calcula pelo comprimento do lado:
+        6s = 2 * pi * R, onde R e s = 1
+    """
+    if N < 3:
+      print("O número de lados deve ser >= 3")
+
+    """verifica que N é multiplo de 6*2k
+    faz uma cópia de N, para não alterar o valor original
+    inicia k em zero
+    verifica que n é par vendo que o resto da divisão por 2 é zero
+    e que n é maior que 6
+    enquanto isso for verdade, divide n por 2 e conta com k quantas vezes
+    dobramos o numero de lados
+    """
+    n = N
+    k = 0
+    while n % 2 == 0 and n > 6:
+        n //= 2
+        k += 1
+    """se n for igual a 6, utilizamos o metodo normal, CIRC/DIAMETRO"""
+    if n == 6:
+      s = r
+      for _ in range(k):
+          s = poligono(s, r)
+      pi_est = (N * s) / (2 * r)
+    else:
+      s = 2 * r * math.sin(math.pi / N)
+      pi_est = (N * s) / (2 * r)
+    return pi_est
+
+
+def evolucao_arquimedes(iteracoes=6, r=1):
+    """
+    Gera uma lista de estimativas de π começando do hexágono (6 lados)
+    e dobrando o número de lados a cada iteração.
+    Retorna uma lista de tuplas (N, pi_est).
+    """
+    resultados = []
+    N = 6
+    s = r
+    pi_est = (N * s) / (2 * r)
+    resultados.append((N, pi_est))
+
+    for _ in range(iteracoes):
+        s = poligono(s, r)
+        N *= 2
+        pi_est = (N * s) / (2 * r)
+        resultados.append((N, pi_est))
+    return resultados
+
+print(evolucao_arquimedes())
